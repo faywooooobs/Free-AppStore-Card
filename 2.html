@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交成功 - 領取獎勵</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" href="https://ssl.gstatic.com/docs/spreadsheets/forms/favicon_qp2.png">
+    <meta name="description" content="荒野亂鬥免費 App Store 卡領取區，填寫資料即可領取免費序號！">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        /* ========================================================= */
+        /* 1. 核心風格 (繼承 Google Forms 樣式) */
+        /* ========================================================= */
+        body {
+            background-color: #f0ebf8; /* 淺紫色背景 */
+            font-family: Roboto, Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-block {
+            max-width: 680px; 
+            width: 100%;
+            margin: 0 auto 20px auto; 
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid rgb(218, 220, 224);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+
+        /* 頂部紫色條 */
+        .header-band {
+            height: 10px;
+            background-color: #673ab7; 
+        }
+
+        .content-padding {
+            padding: 24px;
+        }
+
+        /* 文字樣式 */
+        h1 { color: #202124; font-size: 32px; font-weight: 400; margin: 0 0 12px 0; }
+        p { color: #202124; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+
+        /* ========================================================= */
+        /* 2. 序號顯示區塊 (結合 App Store 元素) */
+        /* ========================================================= */
+        .code-container {
+            background-color: #f8f9fa;
+            border: 2px dashed #dadce0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .code-display {
+            font-family: 'Courier New', monospace;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #1d1d1f;
+            display: block;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+
+        /* ========================================================= */
+        /* 3. 按鈕樣式 (紫色風格) */
+        /* ========================================================= */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .button-style { 
+            background-color: #673ab7; 
+            color: white; 
+            padding: 10px 24px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 500; 
+            transition: background-color 0.2s, box-shadow 0.2s;
+            text-align: center;
+            outline: none;
+        }
+
+        .button-style:hover { 
+            background-color: #5b2fa8; 
+            box-shadow: 0 1px 2px rgba(60,64,67,0.3);
+        }
+
+        .button-secondary {
+            background-color: transparent;
+            color: #673ab7;
+            border: 1px solid #dadce0;
+        }
+
+        .button-secondary:hover {
+            background-color: #f6f2ff;
+        }
+
+        .footer-logo { 
+            text-align: left; 
+            padding: 10px 0; 
+            font-size: 12px; 
+            color: #70757a;
+            max-width: 680px;
+            width: 100%;
+        }
+
+        .success-icon {
+            color: #673ab7;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-block">
+        <div class="header-band"></div>
+        <div class="content-padding">
+            <h1>提交成功！</h1>
+            <p>感謝您的參與。請複製以下專屬序號，並前往 <strong>App Store</strong> 輸入以獲取您的獎勵內容。</p>
+            
+            <div class="code-container" id="codeCard">
+                <span class="code-display" id="resultCode">X7J2K9L4P1M5N8Q2</span>
+                
+                <div class="button-group">
+                    <button class="button-style" onclick="copyCode()">複製序號</button>
+                    <button class="button-style button-secondary" onclick="generate()">重新產生</button>
+                </div>
+            </div>
+
+            <p style="font-size: 12px; color: #5f6368;">* 序號僅供單次兌換使用，請妥善保管。</p>
+        </div>
+    </div>
+
+    <script>
+        // 初始化產生一個序號
+        window.onload = generate;
+
+        function generate() {
+            const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let code = "X"; // Apple 慣例首碼
+            for (let i = 0; i < 15; i++) {
+                code += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            document.getElementById('resultCode').innerText = code;
+            
+            // 視覺回饋
+            const card = document.getElementById('codeCard');
+            card.style.borderColor = '#673ab7';
+            setTimeout(() => card.style.borderColor = '#dadce0', 500);
+        }
+
+        function copyCode() {
+            const text = document.getElementById('resultCode').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+            }).catch(err => {
+                console.error('無法複製', err);
+            });
+        }
+    </script>
+
+</body>
+</html>
